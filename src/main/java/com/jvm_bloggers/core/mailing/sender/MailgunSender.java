@@ -1,7 +1,8 @@
 package com.jvm_bloggers.core.mailing.sender;
 
-
 import com.google.common.util.concurrent.RateLimiter;
+import com.jvm_bloggers.MailingClient;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,10 +19,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import static com.jvm_bloggers.ApplicationProfiles.PRODUCTION;
-import static com.jvm_bloggers.ApplicationProfiles.STAGE;
 
 @Component
-@Profile({PRODUCTION, STAGE})
+@Profile({PRODUCTION})
 @Slf4j
 class MailgunSender implements MailSender {
 
@@ -33,7 +33,7 @@ class MailgunSender implements MailSender {
     }
 
     @Autowired
-    public MailgunSender(Client mailingRestClient,
+    public MailgunSender(@MailingClient Client mailingRestClient,
                          @Value("${mailing.throttleDelayInSeconds}") long throttleTimeInSeconds) {
         this.mailingRestClient = mailingRestClient;
         this.rateLimiter = RateLimiter.create(1.0 / throttleTimeInSeconds);

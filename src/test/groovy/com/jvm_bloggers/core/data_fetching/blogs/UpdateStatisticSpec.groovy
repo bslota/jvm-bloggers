@@ -5,44 +5,47 @@ import spock.lang.Subject
 
 import java.util.stream.Stream
 
+@Subject(UpdateStatistic)
 class UpdateStatisticSpec extends Specification {
 
     def "Should default to zero"() {
         given:
-            Stream<UpdateStatus> emptyStream = Stream.of()
+        Stream<UpdateStatus> emptyStream = Stream.of()
 
         when:
-            @Subject
-            UpdateStatistic testObj = emptyStream.collect(UpdateStatistic.collector())
+        UpdateStatistic testObj = emptyStream.collect(UpdateStatistic.collector())
 
         then:
-            testObj.getTotal() == 0
-            testObj.getUpdated() == 0
-            testObj.getCreated() == 0
-            testObj.getInvalid() == 0
-            testObj.getNotChanged() == 0
+        with(testObj) {
+            getTotal() == 0
+            getUpdated() == 0
+            getCreated() == 0
+            getInvalid() == 0
+            getNotChanged() == 0
+        }
     }
 
     def "Should count repeating statuses"() {
         given:
-            Stream<UpdateStatus> emptyStream = Stream.of(
-                    UpdateStatus.CREATED,
-                    UpdateStatus.INVALID,
-                    UpdateStatus.NOT_CHANGED,
-                    UpdateStatus.NOT_CHANGED,
-                    UpdateStatus.NOT_CHANGED,
-                    UpdateStatus.CREATED,
-            )
+        Stream<UpdateStatus> emptyStream = Stream.of(
+            UpdateStatus.CREATED,
+            UpdateStatus.INVALID,
+            UpdateStatus.NOT_CHANGED,
+            UpdateStatus.NOT_CHANGED,
+            UpdateStatus.NOT_CHANGED,
+            UpdateStatus.CREATED,
+        )
 
         when:
-            @Subject
-            UpdateStatistic testObj = emptyStream.collect(UpdateStatistic.collector())
+        UpdateStatistic testObj = emptyStream.collect(UpdateStatistic.collector())
 
         then:
-            testObj.getTotal() == 6
-            testObj.getUpdated() == 0
-            testObj.getCreated() == 2
-            testObj.getInvalid() == 1
-            testObj.getNotChanged() == 3
+        with(testObj) {
+            getTotal() == 6
+            getUpdated() == 0
+            getCreated() == 2
+            getInvalid() == 1
+            getNotChanged() == 3
+        }
     }
 }

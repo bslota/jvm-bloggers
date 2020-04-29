@@ -377,4 +377,239 @@
         <addUniqueConstraint tableName="METADATA" columnNames="NAME" constraintName="metadata_name_unique"/>
     </changeSet>
 
+    <changeSet id="038-create-tables-for-top-posts-summary" author="Tomasz Dziurko">
+        <createSequence sequenceName="TOP_POSTS_SUMMARY_SEQ"/>
+
+        <createTable tableName="TOP_POSTS_SUMMARY">
+            <column name="ID" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="YEAR" type="INT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="MONTH" type="INT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="CREATED" type="timestamp without time zone">
+                <constraints nullable="false"/>
+            </column>
+
+        </createTable>
+
+        <createSequence sequenceName="POPULAR_PERSONAL_POST_SEQ"/>
+
+        <createTable tableName="POPULAR_PERSONAL_POST">
+            <column name="ID" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="POSITION" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="BLOG_POST_ID" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="TOP_POSTS_SUMMARY_ID" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="NUMBER_OF_CLICKS" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="POPULAR_PERSONAL_POST" baseColumnNames="BLOG_POST_ID"
+                                 constraintName="POPULAR_PERSONAL_POST_TO_BLOG_POST" referencedTableName="BLOG_POST"
+                                 referencedColumnNames="ID"
+        />
+
+        <addForeignKeyConstraint baseTableName="POPULAR_PERSONAL_POST" baseColumnNames="TOP_POSTS_SUMMARY_ID"
+                                 constraintName="POPULAR_PERSONAL_POST_TO_TOP_POSTS_SUMMARY" referencedTableName="TOP_POSTS_SUMMARY"
+                                 referencedColumnNames="ID"
+        />
+
+        <createSequence sequenceName="POPULAR_COMPANY_POST_SEQ"/>
+
+        <createTable tableName="POPULAR_COMPANY_POST">
+            <column name="ID" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="POSITION" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="BLOG_POST_ID" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="TOP_POSTS_SUMMARY_ID" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="NUMBER_OF_CLICKS" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="POPULAR_COMPANY_POST" baseColumnNames="BLOG_POST_ID"
+                                 constraintName="POPULAR_COMPANY_POST_TO_BLOG_POST" referencedTableName="BLOG_POST"
+                                 referencedColumnNames="ID"
+        />
+
+        <addForeignKeyConstraint baseTableName="POPULAR_COMPANY_POST" baseColumnNames="TOP_POSTS_SUMMARY_ID"
+                                 constraintName="POPULAR_COMPANY_POST_TO_TOP_POSTS_SUMMARY" referencedTableName="TOP_POSTS_SUMMARY"
+                                 referencedColumnNames="ID"
+        />
+
+        <addUniqueConstraint tableName="TOP_POSTS_SUMMARY" columnNames="YEAR, MONTH" constraintName="TOP_POSTS_SUMMARY_UNIQUE_MONTH_YEAR" />
+
+    </changeSet>
+
+    <changeSet id="039-create-facebook-post-table" author="Michał.Chmielarz">
+
+        <createSequence sequenceName="FB_POST_SEQ"/>
+
+        <createTable tableName="FB_POST">
+            <column name="ID" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="ISSUE_LINK" type="varchar(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="MESSAGE" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="SENT_DATE" type="timestamp without time zone"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="040-add-ip-referer-user-agent-fields-to-click-table" author="Tomasz.Dziurko">
+        <addColumn tableName="CLICK">
+            <column name="IP_ADDRESS" type="varchar(20)"/>
+            <column name="REFERER" type="varchar(256)"/>
+            <column name="USER_AGENT" type="varchar(256)"/>
+        </addColumn>
+
+        <sql>
+            update click set ip_address = id, referer=id, user_agent=id;
+        </sql>
+    </changeSet>
+
+    <changeSet id="041-change-column-name-in-facebook-post-table" author="Michał.Wiącek">
+        <renameColumn tableName="FB_POST" oldColumnName="ISSUE_LINK" newColumnName="LINK"/>
+    </changeSet>
+
+    <changeSet id="042-add-bookmarkable-id-column-to-blog-table" author="Tomasz.Dziurko">
+        <addColumn tableName="BLOG">
+            <column name="BOOKMARKABLE_ID" type="varchar(30)">
+                <constraints unique="true" uniqueConstraintName="BLOG_BOOKMARKABLE_ID_UNIQUE"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="043-drop-json-id-column-in-blog-table" author="Łukasz.Drążek" >
+        <dropColumn tableName="BLOG" columnName="JSON_ID"/>
+    </changeSet>
+
+    <changeSet id="044-bookmarkable-id-column-in-blog-table-not-nullable" author="Tomasz.Dziurko" >
+        <addNotNullConstraint tableName="BLOG" columnName="BOOKMARKABLE_ID" columnDataType="varchar(30)"/>
+    </changeSet>
+
+    <changeSet id="045-create-tweet-table" author="Michał.Chmielarz">
+
+        <createSequence sequenceName="TWEET_SEQ"/>
+
+        <createTable tableName="TWEET">
+            <column name="ID" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="CONTENT" type="varchar(140)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="SENT_DATE" type="timestamp without time zone"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="046-add-moderation-required-column-to-blog-table" author="vlosrutere">
+        <addColumn tableName="BLOG">
+            <column name="MODERATION_REQUIRED" type="boolean"/>
+        </addColumn>
+
+        <sql>update BLOG set MODERATION_REQUIRED = (CASE WHEN BLOG_TYPE = 'PERSONAL' THEN FALSE ELSE TRUE END)</sql>
+        
+        <addNotNullConstraint tableName="BLOG" columnName="MODERATION_REQUIRED" columnDataType="boolean"/>
+    </changeSet>
+
+    <changeSet id="048-add-sent-flag-to-fb-and-twitter-post-tables" author="Tomasz.Dziurko">
+        <addColumn tableName="FB_POST">
+            <column name="SENT" type="boolean"/>
+        </addColumn>
+
+        <sql>UPDATE FB_POST set SENT = true where SENT_DATE is not null;</sql>
+
+        <addNotNullConstraint tableName="FB_POST" columnName="SENT" columnDataType="boolean"/>
+
+
+        <addColumn tableName="TWEET">
+            <column name="SENT" type="boolean"/>
+        </addColumn>
+
+        <sql>UPDATE TWEET set SENT = true where SENT_DATE is not null;</sql>
+
+        <addNotNullConstraint tableName="TWEET" columnName="SENT" columnDataType="boolean"/>
+    </changeSet>
+
+    <changeSet id="049-rename-send-date-columnt-in-fb-and-twitter-post-tables" author="Tomasz.Dziurko">
+
+        <renameColumn tableName="TWEET" oldColumnName="SENT_DATE" newColumnName="POSTING_DATE"/>
+        <renameColumn tableName="FB_POST" oldColumnName="SENT_DATE" newColumnName="POSTING_DATE"/>
+    </changeSet>
+
+    <!--<changeSet id="047-add-polish-collation-to-author-column-in-blog-table" author="vlosrutere" dbms="postgresql">-->
+        <!--<sql>ALTER TABLE BLOG ALTER COLUMN AUTHOR TYPE VARCHAR(250) COLLATE "pl_PL"</sql>-->
+    <!--</changeSet>-->
+  
+    <changeSet id="049-create-varia-suggestion-table" author="ajurasz">
+        <createSequence sequenceName="VARIA_SUGGESTION_SEQ"/>
+
+        <createTable tableName="VARIA_SUGGESTION">
+            <column name="ID" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="URL" type="varchar(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="REASON" type="varchar(2048)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="author" type="varchar(250)"/>
+            <column name="CREATE_DATE" type="timestamp without timezone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="READ" type="boolean"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="050-increase-length-of-content-in-tweet-table" author="Tomasz.Dziurko">
+        <modifyDataType tableName="tweet" columnName="content" newDataType="varchar(280)"/>
+    </changeSet>
+
+    <changeSet id="051-rename-videos-blog-type-to-presentation" author="Tomasz.Dziurko">
+        <sql>
+            update blog set blog_type = 'PRESENTATION' where blog_type='VIDEOS'
+        </sql>
+    </changeSet>
+    <changeSet id="052-add-podcasts-to-mailing-template" author="Tomasz.Dziurko">
+        <sqlFile path="052-update_mailing_template_add_podcasts.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+
 </databaseChangeLog>

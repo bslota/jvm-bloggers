@@ -1,0 +1,98 @@
+{
+  "bloggers": [
+    {
+      "bookmarkableId": "trojmiasto-jug",
+      "name": "Trójmiasto JUG",
+      "rss": "https://www.youtube.com/feeds/videos.xml?channel_id=UCU5x5RmlIUUTyZIQKZkXHUw",
+      "twitter": "@JUGTricity"
+    },
+    {
+      "bookmarkableId": "warszawa-jug",
+      "name": "Warszawa JUG",
+      "rss": "https://www.youtube.com/feeds/videos.xml?channel_id=UC2coGyxf5x_CzJ3l4F-N-Sw",
+      "twitter": "@warszawajug"
+    },
+    {
+      "bookmarkableId": "lodz-jug",
+      "name": "Łódź JUG",
+      "rss": "https://www.youtube.com/feeds/videos.xml?channel_id=UCS5yGVNI9HfkGz9EngOLqIQ",
+      "twitter": "@juglodz"
+    },
+    {
+      "bookmarkableId": "torun-jug",
+      "name": "Toruń JUG",
+      "rss": "https://www.youtube.com/feeds/videos.xml?channel_id=UCLuHypXd9ODOivs7gRpxNZg",
+      "twitter": "@TorunJUG"
+    },
+    {
+      "bookmarkableId": "poznan-jug",
+      "name": "Poznań JUG",
+      "rss": "https://www.youtube.com/feeds/videos.xml?channel_id=UCNQqIfvcYb1nWNFP-X1woAQ",
+      "twitter": "@PoznanJUG"
+    },
+    {
+      "bookmarkableId": "polish-jug",
+      "name": "Polish JUG",
+      "rss": "https://www.youtube.com/feeds/videos.xml?channel_id=UCFQJHkJln2LF1gYy3lMqCnw",
+      "twitter": "@polishjug"
+    },
+    {
+      "bookmarkableId": "geecon",
+      "name": "GeeCON",
+      "rss": "https://www.youtube.com/feeds/videos.xml?channel_id=UCVnJYdr91EZW8YvtMrxB1bg",
+      "twitter": "@geecon"
+    },
+    {
+      "bookmarkableId": "confitura",
+      "name": "Confitura",
+      "rss": "https://www.youtube.com/feeds/videos.xml?channel_id=UCkVjQGf_e0JmlonPMS4VNXQ",
+      "twitter": "@confiturapl"
+    },
+    {
+      "bookmarkableId": "wroclaw-jug",
+      "name": "Wrocław JUG",
+      "rss": "https://www.youtube.com/feeds/videos.xml?channel_id=UCvj_1SWNU4diTM2Z2KCUHug"
+    },
+    {
+      "bookmarkableId": "jsession",
+      "name": "jSession",
+      "rss": "https://www.youtube.com/feeds/videos.xml?channel_id=UCjBzbSV4De3Bjt_9BtBGsmQ",
+      "twitter": "@jSessionPL"
+    },
+    {
+      "bookmarkableId": "bydgoszcz-jug",
+      "name": "Bydgoszcz JUG",
+      "rss": "https://www.youtube.com/feeds/videos.xml?channel_id=UCaA4Zh3F8KRbtB1GW4ZW2lw",
+      "twitter": "@BydgoszczJUG"
+    },
+    {
+      "bookmarkableId": "segfault",
+      "name": "Konferencje SegFault",
+      "rss": "https://www.youtube.com/feeds/videos.xml?channel_id=UCV38Do_3C5uVk3lWePkyxTA",
+      "twitter": "@SegFaultConf"
+    },
+    {
+      "bookmarkableId": "j-santa-conf",
+      "name": "J-Santa Conference",
+      "rss": "https://www.youtube.com/feeds/videos.xml?channel_id=UC2IFpEO6fHK4_fKn-gymwKw"
+    },
+    {
+      "bookmarkableId": "greenfield-conf",
+      "name": "Greenfield Conference",
+      "rss": "https://www.youtube.com/feeds/videos.xml?channel_id=UChG7hsrjUYyYG13AkSIfQIw",
+      "twitter": "@Greenfield_Conf"
+    },
+    {
+      "bookmarkableId": "bitconf",
+      "name": "Bydgoszcz IT Conference",
+      "rss": "https://www.youtube.com/feeds/videos.xml?channel_id=UCBpSxlHqk4-jjYyfrmX3ikQ",
+      "twitter": "@bitconf_pl"
+    },
+    {
+      "bookmarkableId": "programistok",
+      "name": "Programistok",
+      "rss": "https://www.youtube.com/feeds/videos.xml?channel_id=UCoyU8Ehx9tbRJhYXrbt5lgA",
+      "twitter": "@programistok"
+    }
+  ]
+}

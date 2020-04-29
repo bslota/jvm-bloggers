@@ -7,53 +7,58 @@ import com.jvm_bloggers.entities.metadata.Metadata;
 import com.jvm_bloggers.entities.metadata.MetadataKeys;
 import com.jvm_bloggers.entities.metadata.MetadataRepository;
 import com.jvm_bloggers.utils.NowProvider;
+
+import io.vavr.control.Option;
+import io.vavr.control.Try;
+
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Optional;
 
 @Component
 @Slf4j
+@NoArgsConstructor
 public class BloggersDataFetcher {
 
-    private final Optional<URL> bloggersUrlOptional;
-    private final Optional<URL> companiesUrlOptional;
-    private final Optional<URL> videosUrlOptional;
-    private final BloggersDataUpdater bloggersDataUpdater;
-    private final ObjectMapper mapper;
-    private final MetadataRepository metadataRepository;
-    private final NowProvider nowProvider;
+    private Option<URL> bloggersUrlOption;
+    private Option<URL> companiesUrlOption;
+    private Option<URL> presentationsUrlOption;
+    private Option<URL> podcastsUrlString;
+    private BloggersDataUpdater bloggersDataUpdater;
+    private ObjectMapper mapper;
+    private MetadataRepository metadataRepository;
+    private NowProvider nowProvider;
     private final PreventConcurrentExecutionSafeguard concurrentExecutionSafeguard
         = new PreventConcurrentExecutionSafeguard();
 
     @Autowired
     public BloggersDataFetcher(@Value("${bloggers.data.file.url}") String bloggersDataUrlString,
                                @Value("${companies.data.file.url}") String companiesDataUrlString,
-                               @Value("${youtube.data.file.url}") String videosDataUrlString,
+                               @Value("${presentations.data.file.url}") String presentationsDataUrlString,
+                               @Value("${podcasts.data.file.url}") String podcastsDataUrlString,
                                BloggersDataUpdater bloggersDataUpdater,
                                ObjectMapper mapper, MetadataRepository metadataRepository,
                                NowProvider nowProvider) {
-        bloggersUrlOptional = convertToUrl(bloggersDataUrlString);
-        companiesUrlOptional = convertToUrl(companiesDataUrlString);
-        videosUrlOptional = convertToUrl(videosDataUrlString);
+        bloggersUrlOption = convertToUrl(bloggersDataUrlString);
+        companiesUrlOption = convertToUrl(companiesDataUrlString);
+        presentationsUrlOption = convertToUrl(presentationsDataUrlString);
+        podcastsUrlString = convertToUrl(podcastsDataUrlString);
         this.bloggersDataUpdater = bloggersDataUpdater;
         this.mapper = mapper;
         this.metadataRepository = metadataRepository;
         this.nowProvider = nowProvider;
     }
 
-    private Optional<URL> convertToUrl(String urlString) {
-        try {
-            return Optional.of(new URL(urlString));
-        } catch (MalformedURLException exception) {
-            log.error("Invalid URL " + urlString);
-            return Optional.empty();
-        }
+    private Option<URL> convertToUrl(String urlString) {
+        return Try
+            .of(() -> new URL(urlString))
+            .onFailure(exc -> log.error("Invalid URL " + urlString))
+            .toOption();
     }
 
     public void refreshData() {
@@ -66,9 +71,10 @@ public class BloggersDataFetcher {
     }
 
     private Void startFetchingProcess() {
-        refreshBloggersDataFor(bloggersUrlOptional, BlogType.PERSONAL);
-        refreshBloggersDataFor(companiesUrlOptional, BlogType.COMPANY);
-        refreshBloggersDataFor(videosUrlOptional, BlogType.VIDEOS);
+        refreshBloggersDataFor(bloggersUrlOption, BlogType.PERSONAL);
+        refreshBloggersDataFor(companiesUrlOption, BlogType.COMPANY);
+        refreshBloggersDataFor(presentationsUrlOption, BlogType.PRESENTATION);
+        refreshBloggersDataFor(podcastsUrlString, BlogType.PODCAST);
 
         final Metadata dateOfLastFetch = metadataRepository
             .findByName(MetadataKeys.DATE_OF_LAST_FETCHING_BLOGGERS);
@@ -77,15 +83,15 @@ public class BloggersDataFetcher {
         return null;
     }
 
-    private void refreshBloggersDataFor(Optional<URL> blogsDataUrl, BlogType blogType) {
-        if (blogsDataUrl.isPresent()) {
+    private void refreshBloggersDataFor(Option<URL> blogsDataUrl, BlogType blogType) {
+        if (blogsDataUrl.isDefined()) {
             try {
                 BloggersData bloggers = mapper.readValue(blogsDataUrl.get(), BloggersData.class);
                 bloggers.getBloggers().forEach(it -> it.setBlogType(blogType));
                 UpdateStatistic updateStatistic = bloggersDataUpdater.updateData(bloggers);
                 log.info("Refreshed {} blogs: {}", blogType, updateStatistic);
             } catch (Exception exception) {
-                log.error("Exception during parse process for {}", blogType, exception);
+                log.error("Exception during parse process for " + blogType, exception);
             }
         } else {
             log.warn("No valid URL specified for {}. Skipping.", blogType);

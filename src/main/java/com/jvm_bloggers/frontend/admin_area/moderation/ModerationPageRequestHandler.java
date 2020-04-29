@@ -5,6 +5,7 @@ import com.jvm_bloggers.entities.blog_post.BlogPostRepository;
 import com.jvm_bloggers.frontend.admin_area.PaginationConfiguration;
 import com.jvm_bloggers.frontend.admin_area.blogs.BlogPostModel;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.model.IModel;
@@ -16,12 +17,13 @@ import java.util.Iterator;
 
 @Component
 @Slf4j
-@AllArgsConstructor(onConstructor = @__(@Autowired))
+@NoArgsConstructor
+@AllArgsConstructor(onConstructor_ = {@Autowired})
 public class ModerationPageRequestHandler implements IDataProvider<BlogPost> {
 
-    private final BlogPostRepository blogPostRepository;
+    private BlogPostRepository blogPostRepository;
 
-    private final PaginationConfiguration paginationConfiguration;
+    private PaginationConfiguration paginationConfiguration;
 
     @Override
     public Iterator<? extends BlogPost> iterator(long first, long count) {
@@ -29,7 +31,7 @@ public class ModerationPageRequestHandler implements IDataProvider<BlogPost> {
         int page = Long.valueOf(first / paginationConfiguration.getDefaultPageSize()).intValue();
         long start = System.currentTimeMillis();
         Iterator<BlogPost> iterator = blogPostRepository
-            .findLatestPosts(new PageRequest(page, paginationConfiguration.getDefaultPageSize()))
+            .findLatestPosts(PageRequest.of(page, paginationConfiguration.getDefaultPageSize()))
             .iterator();
         long stop = System.currentTimeMillis();
         log.debug("Iterator() execution time = " + (stop - start) + " ms");

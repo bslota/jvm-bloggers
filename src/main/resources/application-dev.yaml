@@ -1,6 +1,8 @@
+server.port: 8080
+
 spring:
   datasource:
-    url: jdbc:postgresql://jvm-bloggers-db:5432/jvm_bloggers
+    url: jdbc:postgresql://localhost:5432/jvm_bloggers
     username: jvm_bloggers
     password: jvm_bloggers
     driver: org.postgresql.Driver
@@ -13,13 +15,21 @@ mailing:
   fromEmail: "empty"
 
 # Wicket configuration
-wicket.core.settings.general.runtime-configuration: development
-wicket.core.settings.debug.development-utilities-enabled: true
-wicket.core.settings.debug.enabled: true
-wicket.core.settings.debug.developmentUtilitiesEnabled: true
-wicket.core.settings.debug.ajaxDebugModeEnabled: true
-wicket.core.settings.debug.componentUseCheck: true
+wicket:
+  core:
+    settings:
+      general:
+        configuration-type: development
+      debug:
+        enabled: true
+        component-use-check: true
+        development-utilities-enabled: true
+        ajaxDebugModeEnabled: true
 
 logging.level.com.jvm_bloggers: DEBUG
 
-application.baseUrl: http://localhost:8080
+application.baseUrl: http://localhost:${server.port}
+
+facebook.api:
+  userToken: #User access token can be created as it is described in FACEBOOK.md
+  appSecret: #To get application's secret check FACEBOOK.md

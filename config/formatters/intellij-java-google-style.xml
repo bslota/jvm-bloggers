@@ -101,6 +101,8 @@
             <emptyLine/>
             <package name="info" withSubpackages="true" static="false"/>
             <emptyLine/>
+            <package name="io" withSubpackages="true" static="false"/>
+            <emptyLine/>
             <package name="it" withSubpackages="true" static="false"/>
             <emptyLine/>
             <package name="jal" withSubpackages="true" static="false"/>
@@ -118,6 +120,8 @@
             <package name="javancss" withSubpackages="true" static="false"/>
             <emptyLine/>
             <package name="javanet" withSubpackages="true" static="false"/>
+            <emptyLine/>
+            <package name="javaslang" withSubpackages="true" static="false"/>
             <emptyLine/>
             <package name="javassist" withSubpackages="true" static="false"/>
             <emptyLine/>

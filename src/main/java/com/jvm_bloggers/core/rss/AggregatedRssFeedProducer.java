@@ -16,11 +16,12 @@ import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.feed.synd.SyndFeedImpl;
 import com.rometools.rome.feed.synd.SyndLink;
 import com.rometools.rome.feed.synd.SyndLinkImpl;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
@@ -28,7 +29,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -37,25 +38,25 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Service
 @CacheConfig(cacheNames = AggregatedRssFeedProducer.RSS_CACHE)
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 @Slf4j
 public class AggregatedRssFeedProducer {
 
     public static final String RSS_CACHE = "Aggregated RSS feed cache";
     @VisibleForTesting
     static final String FEED_DESCRIPTION =
-        "JVMBloggers aggregated feed. You can customize your rss results by using parameters "
+        "JVM Bloggers aggregated feed. You can customize your rss results by using parameters "
         + "`limit` and 'excludedAuthors` (comma delimited names) parameters. "
         + "Example: http://jvm-bloggers.com/pl/rss?limit=5&excludedAuthors=Tomasz Dziurko Adam Warski";
 
     @VisibleForTesting
-    static final String FEED_TITLE = "JVMBloggers";
+    static final String FEED_TITLE = "JVM Bloggers";
     @VisibleForTesting
     static final String FEED_TYPE = "atom_1.0";
     @VisibleForTesting
     static final Set<String> INCLUDE_ALL_AUTHORS_SET = ImmutableSet.of(StringUtils.EMPTY);
 
-    private static final String SELF_REL = "self";
+    public static final String SELF_REL = "self";
     private final BlogPostRepository blogPostRepository;
     private final NowProvider nowProvider;
     private final LinkGenerator linkGenerator;
@@ -87,14 +88,12 @@ public class AggregatedRssFeedProducer {
             stopWatch.start();
         }
 
-        final Pageable pageRequest = new PageRequest(0, limit > 0 ? limit : Integer.MAX_VALUE);
+        final Pageable pageRequest = PageRequest.of(0, limit > 0 ? limit : Integer.MAX_VALUE);
         if (CollectionUtils.isEmpty(excludedAuthors)) {
             excludedAuthors = INCLUDE_ALL_AUTHORS_SET;
         }
-        final List<BlogPost> approvedPosts =
-            blogPostRepository.findByApprovedTrueAndBlogAuthorNotInOrderByApprovedDateDesc(
-                pageRequest, excludedAuthors
-                );
+        final List<BlogPost> approvedPosts = blogPostRepository
+            .findByApprovedTrueAndBlogAuthorNotInOrderByApprovedDateDesc(pageRequest, excludedAuthors);
         final List<SyndEntry> feedItems = approvedPosts.stream()
             .filter(it -> Validators.isUrlValid(it.getUrl()))
             .map(this::toRssEntry)
@@ -136,7 +135,7 @@ public class AggregatedRssFeedProducer {
         feed.setTitle(FEED_TITLE);
         feed.setFeedType(FEED_TYPE);
         feed.setDescription(FEED_DESCRIPTION);
-        feed.setLinks(Arrays.asList(feedLink));
+        feed.setLinks(Collections.singletonList(feedLink));
         feed.setPublishedDate(DateTimeUtilities.toDate(nowProvider.now()));
         feed.setEntries(feedItems);
         return feed;

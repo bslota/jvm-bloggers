@@ -1,39 +1,27 @@
 package com.jvm_bloggers.frontend.public_area.newsletter_issue.newsletter_panel;
 
-import com.jvm_bloggers.frontend.public_area.newsletter_issue.BlogPostDto;
+import com.jvm_bloggers.domain.query.published_newsletter_issue.PublishedPost;
+import com.jvm_bloggers.frontend.common_components.PublishedBlogPostLink;
+import io.vavr.collection.Seq;
+
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.markup.html.panel.Panel;
 
-import java.util.List;
+class BlogPostLinksSection extends Panel {
 
-public class BlogPostLinksSection extends Panel {
-
-    private static final String TWITTER_HOME_URL = "https://twitter.com/";
-
-    public BlogPostLinksSection(String id, String heading, List<BlogPostDto> blogPosts) {
+    BlogPostLinksSection(String id, String heading, Seq<PublishedPost> blogPosts) {
         super(id);
         add(new Label("sectionHeading", heading));
-        add(new ListView<BlogPostDto>("postItems", blogPosts) {
+        add(new ListView<PublishedPost>("postItems", blogPosts.toJavaList()) {
             @Override
-            protected void populateItem(ListItem<BlogPostDto> item) {
-                BlogPostDto post = item.getModelObject();
-                boolean authorHasTwitterHandle = post.authorTwitterHandle != null;
-                item.add(new ExternalLink("postLink", post.url, post.title));
-                Label authorLabel = new Label("authorLabel", post.authorName);
-                authorLabel.setVisible(!authorHasTwitterHandle);
-                item.add(authorLabel);
-                item.add(
-                    new ExternalLink(
-                        "authorTwitterLink",
-                        TWITTER_HOME_URL + post.authorTwitterHandle,
-                        post.authorName
-                    ).setVisible(authorHasTwitterHandle));
+            protected void populateItem(ListItem<PublishedPost> item) {
+                PublishedPost post = item.getModelObject();
+                item.add(new PublishedBlogPostLink("postLink", post));
             }
         });
-
         setVisible(!blogPosts.isEmpty());
     }
+
 }

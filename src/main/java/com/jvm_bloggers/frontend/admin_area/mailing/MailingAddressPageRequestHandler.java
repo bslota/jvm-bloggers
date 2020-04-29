@@ -3,17 +3,18 @@ package com.jvm_bloggers.frontend.admin_area.mailing;
 import com.jvm_bloggers.entities.mailing_address.MailingAddress;
 import com.jvm_bloggers.entities.mailing_address.MailingAddressRepository;
 import com.jvm_bloggers.frontend.admin_area.PaginationConfiguration;
+
 import lombok.AllArgsConstructor;
+
 import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.model.IModel;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import java.util.Iterator;
 
 @Component
-@AllArgsConstructor(onConstructor = @__(@Autowired))
+@AllArgsConstructor
 public class MailingAddressPageRequestHandler implements IDataProvider<MailingAddress> {
 
     private final PaginationConfiguration paginationConfiguration;
@@ -24,7 +25,7 @@ public class MailingAddressPageRequestHandler implements IDataProvider<MailingAd
     public Iterator<? extends MailingAddress> iterator(long first, long count) {
         int page = Long.valueOf(first / paginationConfiguration.getDefaultPageSize()).intValue();
         return mailingAddressRepository
-                .findAllByOrderByAddressAsc(new PageRequest(page,
+                .findAllByOrderByAddressAsc(PageRequest.of(page,
                         paginationConfiguration.getDefaultPageSize())
                 ).iterator();
     }
@@ -49,6 +50,6 @@ public class MailingAddressPageRequestHandler implements IDataProvider<MailingAd
     }
 
     public void delete(Long mailingAddressId) {
-        mailingAddressRepository.delete(mailingAddressId);
+        mailingAddressRepository.deleteById(mailingAddressId);
     }
 }

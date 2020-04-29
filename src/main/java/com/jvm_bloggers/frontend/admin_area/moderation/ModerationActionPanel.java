@@ -12,7 +12,6 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
-
 @Slf4j
 class ModerationActionPanel extends Panel {
 
@@ -36,7 +35,7 @@ class ModerationActionPanel extends Panel {
         AjaxButton rejectPost = new AjaxButton("rejectPost", moderationForm) {
 
             @Override
-            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+            protected void onSubmit(AjaxRequestTarget target) {
                 log.debug("Reject clicked");
                 BlogPost blogPost = blogPostModel.getObject();
                 blogPost.reject();
@@ -59,7 +58,7 @@ class ModerationActionPanel extends Panel {
         AjaxButton acceptPost = new AjaxButton("acceptPost", moderationForm) {
 
             @Override
-            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+            protected void onSubmit(AjaxRequestTarget target) {
                 log.debug("Accept clicked");
                 BlogPost blogPost = blogPostModel.getObject();
                 blogPost.approve(nowProvider.now());

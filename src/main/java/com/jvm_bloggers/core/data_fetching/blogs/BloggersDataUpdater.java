@@ -6,17 +6,17 @@ import com.jvm_bloggers.core.rss.SyndFeedProducer;
 import com.jvm_bloggers.entities.blog.Blog;
 import com.jvm_bloggers.entities.blog.BlogRepository;
 import com.jvm_bloggers.utils.NowProvider;
+import io.vavr.control.Option;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
+import static com.jvm_bloggers.entities.blog.BlogType.PERSONAL;
 
 @Component
 @Slf4j
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class BloggersDataUpdater {
 
     private final BlogRepository blogRepository;
@@ -34,19 +34,19 @@ public class BloggersDataUpdater {
 
     private UpdateStatus updateSingleEntry(BloggerEntry bloggerEntry) {
         return blogRepository
-            .findByJsonId(bloggerEntry.getJsonId())
+            .findByBookmarkableId(bloggerEntry.getBookmarkableId())
             .map(bloggerWithSameId ->
                 updateBloggerIfThereAreAnyChanges(bloggerEntry, bloggerWithSameId))
-            .orElseGet(() -> createNewBlogger(bloggerEntry));
+            .getOrElse(() -> createNewBlogger(bloggerEntry));
     }
 
     private UpdateStatus updateBloggerIfThereAreAnyChanges(BloggerEntry bloggerEntry,
                                                            Blog existingBlogger) {
-        Optional<String> validBlogUrl = extractValidBlogUrlFromFeed(bloggerEntry.getRss());
-        validBlogUrl.ifPresent(bloggerEntry::setUrl);
+        Option<String> validBlogUrl = extractValidBlogUrlFromFeed(bloggerEntry.getRss());
+        validBlogUrl.forEach(bloggerEntry::setUrl);
 
         if (bloggerChangedVerifier.pendingChanges(existingBlogger, bloggerEntry)) {
-            existingBlogger.setJsonId(bloggerEntry.getJsonId());
+            existingBlogger.setBookmarkableId(bloggerEntry.getBookmarkableId());
             existingBlogger.setAuthor(bloggerEntry.getName());
             existingBlogger.setTwitter(bloggerEntry.getTwitter());
             existingBlogger.setRss(bloggerEntry.getRss());
@@ -61,30 +61,31 @@ public class BloggersDataUpdater {
         }
     }
 
-    private Optional<String> extractValidBlogUrlFromFeed(String rss) {
+    private Option<String> extractValidBlogUrlFromFeed(String rss) {
         return syndFeedFactory.validUrlFromRss(rss);
     }
 
     private UpdateStatus createNewBlogger(BloggerEntry bloggerEntry) {
-        Optional<String> validBlogUrl = extractValidBlogUrlFromFeed(bloggerEntry.getRss());
-        if (!validBlogUrl.isPresent()) {
+        Option<String> validBlogUrl = extractValidBlogUrlFromFeed(bloggerEntry.getRss());
+        if (validBlogUrl.isEmpty()) {
             log.warn("No url found for blog {}, Skipping", bloggerEntry.getRss());
             return UpdateStatus.INVALID;
         }
-        validBlogUrl.ifPresent(bloggerEntry::setUrl);
+        validBlogUrl.forEach(bloggerEntry::setUrl);
 
         Blog newBlog = Blog.builder()
-            .jsonId(bloggerEntry.getJsonId())
+            .bookmarkableId(bloggerEntry.getBookmarkableId())
             .author(bloggerEntry.getName())
             .rss(bloggerEntry.getRss())
             .url(syndFeedFactory.validUrlFromRss(
-                bloggerEntry.getRss()).orElse(null)
+                bloggerEntry.getRss()).getOrElse(() -> null)
             )
             .twitter(bloggerEntry.getTwitter())
             .url(bloggerEntry.getUrl())
             .dateAdded(nowProvider.now())
             .blogType(bloggerEntry.getBlogType())
             .active(true)
+            .moderationRequired(bloggerEntry.getBlogType() != PERSONAL)
             .build();
         blogRepository.save(newBlog);
         return UpdateStatus.CREATED;

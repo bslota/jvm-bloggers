@@ -1,4 +1,4 @@
-liquibase.change-log: classpath:db/changelog/db.changelog.xml
+spring.liquibase.change-log: classpath:db/changelog/db.changelog.xml
 
 bloggers.data.file.url: https://raw.githubusercontent.com/jvm-bloggers/jvm-bloggers/master/bloggers.json
 companies.data.file.url: https://raw.githubusercontent.com/jvm-bloggers/jvm-bloggers/master/companies.json
@@ -10,3 +10,8 @@ mailing:
   fromEmail: "example@example.com"
 
 items.pagination.size: 15
+
+facebook:
+  userToken: "fbUserToken"
+  pageId: "fbPageId"
+  appSecret: "fbAppSecret"

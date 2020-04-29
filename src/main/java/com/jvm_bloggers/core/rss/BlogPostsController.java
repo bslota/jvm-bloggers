@@ -1,41 +1,78 @@
 package com.jvm_bloggers.core.rss;
 
-import com.rometools.rome.io.SyndFeedOutput;
+import com.rometools.rome.feed.synd.SyndFeed;
+
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
+
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.PrintWriter;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import static com.google.common.base.MoreObjects.firstNonNull;
+import static org.springframework.http.MediaType.APPLICATION_ATOM_XML_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class BlogPostsController {
+    public static final String ENTRIES_RSS_FEED = "/pl/rss";
+    public static final String ISSUES_RSS_FEED = "/pl/issues-rss";
 
-    private final AggregatedRssFeedProducer rssProducer;
+    private final AggregatedRssFeedProducer blogRssProducer;
+    private final IssuesRssFeedProducer issuesRssProducer;
 
-    @SneakyThrows
-    @RequestMapping("/pl/rss")
-    public void getRss(HttpServletRequest request, HttpServletResponse response,
-        PrintWriter writer, @RequestParam(required = false) Integer limit,
-        @Value("${generated.rss.entries.limit}") int defaultLimit,
-        @RequestParam(required = false) Set<String> excludedAuthors) {
-        limit = firstNonNull(limit, defaultLimit);
-        response.setContentType(MediaType.APPLICATION_ATOM_XML_VALUE);
-        new SyndFeedOutput().output(
-            rssProducer.getRss(request.getRequestURL().toString(), limit, excludedAuthors),
-            writer
-        );
+    @RequestMapping(
+      method = RequestMethod.GET,
+      path = { ENTRIES_RSS_FEED + ".xml", ENTRIES_RSS_FEED},
+      produces = APPLICATION_ATOM_XML_VALUE
+    )
+    public SyndFeed getRssAxXml(
+      HttpServletRequest request,
+      @RequestParam(defaultValue = "${generated.rss.entries.limit}") Integer limit,
+      @RequestParam(required = false) Set<String> excludedAuthors) {
+
+        return blogRssProducer.getRss(request.getRequestURL().toString(), limit, excludedAuthors);
+    }
+
+    @RequestMapping(
+      method = RequestMethod.GET,
+      path = ENTRIES_RSS_FEED + ".json",
+      produces = APPLICATION_JSON_VALUE
+    )
+    public SyndFeed getRssAsJson(
+      HttpServletRequest request,
+      @RequestParam(defaultValue = "${generated.rss.entries.limit}") Integer limit,
+      @RequestParam(required = false) Set<String> excludedAuthors) {
+
+        return blogRssProducer.getRss(request.getRequestURL().toString(), limit, excludedAuthors);
+    }
+
+    @RequestMapping(
+      method = RequestMethod.GET,
+      path = {ISSUES_RSS_FEED, ISSUES_RSS_FEED + ".xml" },
+      produces = APPLICATION_ATOM_XML_VALUE
+    )
+    public SyndFeed getEntriesRss(
+      HttpServletRequest request,
+      @RequestParam(defaultValue = "${generated.rss.entries.limit}") Integer limit) {
+
+        return issuesRssProducer.getRss(request.getRequestURL().toString(), limit);
+    }
+
+    @RequestMapping(
+      method = RequestMethod.GET,
+      path = ISSUES_RSS_FEED + ".json",
+      produces = { APPLICATION_JSON_VALUE}
+    )
+    public SyndFeed getEntriesRssAsJson(
+      HttpServletRequest request,
+      @RequestParam(defaultValue = "${generated.rss.entries.limit}") Integer limit) {
+
+        return issuesRssProducer.getRss(request.getRequestURL().toString(), limit);
     }
 
 }

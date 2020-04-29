@@ -7,7 +7,13 @@ spring:
   http.encoding.force: true
   mandatory-file-encoding: UTF-8 
   jpa.hibernate.ddl-auto: validate
-liquibase.change-log: classpath:db/changelog/db.changelog.xml
+  liquibase.change-log: classpath:db/changelog/db.changelog.xml
+
+# Wicket configuration
+wicket:
+  core:
+    csrf.accepted-origins.*: jvm-bloggers.com
+  external.webjars.enabled: true
 
 server.compression:
   enabled: true
@@ -15,19 +21,50 @@ server.compression:
  
 bloggers.data.file.url: https://raw.githubusercontent.com/jvm-bloggers/jvm-bloggers/master/src/main/resources/blogs/bloggers.json
 companies.data.file.url: https://raw.githubusercontent.com/jvm-bloggers/jvm-bloggers/master/src/main/resources/blogs/companies.json
-youtube.data.file.url: https://raw.githubusercontent.com/jvm-bloggers/jvm-bloggers/master/src/main/resources/blogs/videos.json
+presentations.data.file.url: https://raw.githubusercontent.com/jvm-bloggers/jvm-bloggers/master/src/main/resources/blogs/presentations.json
+podcasts.data.file.url: https://raw.githubusercontent.com/jvm-bloggers/jvm-bloggers/master/src/main/resources/blogs/podcasts.json
 generated.rss.entries.limit: 50
 items.pagination.size: 15
 max.new.post.age.days: 30
+cache.spec: expireAfterWrite=1d
 
-application.baseUrl: http://jvm-bloggers.com
+application.baseUrl: https://jvm-bloggers.com
 application.issueUrl: ${application.baseUrl}/issue/
+application.topPostsUrl: ${application.baseUrl}/top-articles/
 
 # Logging
 logging.level.root: INFO
 logging.level.com.jvm_bloggers: INFO
 
-scheduler.fetch-bloggers-data: 0 0 7,9,11,13,15,17,19,21,23 * * *
-scheduler.fetch-rss-for-new-blogs: 0 30 * * * *
-scheduler.publish-new-issue: 0 0 12 * * FRI
-scheduler.send-email: 240000 # 4 minutes
+scheduler:
+  fetch-bloggers-data: 0 5/10 * * * *
+  fetch-rss-for-new-blogs: 0 30 * * * *
+  publish-new-issue: 0 0 7 * * FRI
+  send-email: 30000 # 30 seconds
+  top-posts-in-month-summary: 0 0 13 12 * *
+  publish-fb: 600000 # 10 minutes
+  publish-twitter: 36000 # 5 minutes
+
+github.api:
+  token: #Personal access tokens can be created under https://github.com/settings/tokens
+  apiUrl: https://api.github.com
+  org: jvm-bloggers
+  repo: jvm-bloggers
+  pageSize: 30
+
+facebook.api:
+  userToken: #User access token can be created as it is described in FACEBOOK.md
+  appSecret: #To get application's secret check FACEBOOK.md
+  pageId: "1059067680779426"
+
+twitter.api:
+  consumerKey: #Can be found on Twitter application's page
+  consumerSecret: #Can be found on Twitter application's page
+  accessToken: #Can be found on Twitter application's page
+  accessTokenSecret: #Can be found on Twitter application's page
+  retryCount: 3
+  retryIntervalSecs: 5
+
+slack:
+  invitation-link: https://join.slack.com/t/jvm-poland/shared_invite/enQtODE2ODgwMzU4NzA2LWUyZTIyZGRiOThjMDQ1NzI0OWVjZDVkZjc0ZjQ4OTZmMGM0NWNlNTQ3OTBhZmI5MGQ5Y2VlMmU1MGE4OGY2NTQ
+
